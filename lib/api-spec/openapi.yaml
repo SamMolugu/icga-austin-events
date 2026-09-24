@@ -1,0 +1,402 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: events
+    description: Public event discovery and scheduling
+  - name: registrations
+    description: Attendee registrations
+  - name: donations
+    description: Donation and charity tracking
+  - name: analytics
+    description: Organizer metrics and activity
+  - name: notifications
+    description: Event notification preferences
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /events:
+    get:
+      operationId: listEvents
+      tags: [events]
+      summary: List public events
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: timeframe
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [upcoming, past]
+            default: upcoming
+      responses:
+        "200":
+          description: Events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+    post:
+      operationId: createEvent
+      tags: [events]
+      summary: Create an event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventInput"
+      responses:
+        "201":
+          description: Created event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+  /events/{eventId}:
+    get:
+      operationId: getEvent
+      tags: [events]
+      summary: Get an event
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: updateEvent
+      tags: [events]
+      summary: Update an event
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventUpdate"
+      responses:
+        "200":
+          description: Updated event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+  /registrations:
+    post:
+      operationId: createRegistration
+      tags: [registrations]
+      summary: Register for an event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationInput"
+      responses:
+        "201":
+          description: Registration confirmation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registration"
+        "409":
+          description: Registration conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /registrations/{registrationId}:
+    get:
+      operationId: getRegistration
+      tags: [registrations]
+      summary: Get a registration
+      parameters:
+        - $ref: "#/components/parameters/RegistrationId"
+      responses:
+        "200":
+          description: Registration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registration"
+  /donations:
+    get:
+      operationId: listDonations
+      tags: [donations]
+      summary: List donations
+      parameters:
+        - name: eventId
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Donations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Donation"
+    post:
+      operationId: createDonation
+      tags: [donations]
+      summary: Record a donation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationInput"
+      responses:
+        "201":
+          description: Donation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Donation"
+  /analytics/overview:
+    get:
+      operationId: getAnalyticsOverview
+      tags: [analytics]
+      summary: Get organizer dashboard metrics
+      responses:
+        "200":
+          description: Dashboard metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsOverview"
+  /analytics/activity:
+    get:
+      operationId: getAnalyticsActivity
+      tags: [analytics]
+      summary: Get recent organizer activity
+      responses:
+        "200":
+          description: Activity timeline
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Activity"
+  /notifications/preferences:
+    get:
+      operationId: getNotificationPreferences
+      tags: [notifications]
+      summary: Get notification preferences
+      responses:
+        "200":
+          description: Notification preferences
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPreferences"
+    patch:
+      operationId: updateNotificationPreferences
+      tags: [notifications]
+      summary: Update notification preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationPreferencesUpdate"
+      responses:
+        "200":
+          description: Updated preferences
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPreferences"
+components:
+  parameters:
+    EventId:
+      name: eventId
+      in: path
+      required: true
+      schema:
+        type: integer
+    RegistrationId:
+      name: registrationId
+      in: path
+      required: true
+      schema:
+        type: integer
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+    Event:
+      type: object
+      required: [id, title, slug, description, category, startsAt, endsAt, location, capacity, registeredCount, charityName, charityGoal, charityRaised, status]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        slug: { type: string }
+        description: { type: string }
+        category: { type: string }
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        location: { type: string }
+        imageUrl: { type: ["string", "null"] }
+        capacity: { type: integer }
+        registeredCount: { type: integer }
+        charityName: { type: string }
+        charityGoal: { type: number }
+        charityRaised: { type: number }
+        status: { type: string, enum: [draft, published, completed] }
+    EventInput:
+      type: object
+      required: [title, description, category, startsAt, endsAt, location, capacity, charityName, charityGoal]
+      properties:
+        title: { type: string, minLength: 2 }
+        description: { type: string, minLength: 2 }
+        category: { type: string }
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        location: { type: string }
+        imageUrl: { type: ["string", "null"] }
+        capacity: { type: integer, minimum: 1 }
+        charityName: { type: string }
+        charityGoal: { type: number, minimum: 0 }
+    EventUpdate:
+      type: object
+      properties:
+        title: { type: string, minLength: 2 }
+        description: { type: string, minLength: 2 }
+        category: { type: string }
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        location: { type: string }
+        imageUrl: { type: ["string", "null"] }
+        capacity: { type: integer, minimum: 1 }
+        charityName: { type: string }
+        charityGoal: { type: number, minimum: 0 }
+        status: { type: string, enum: [draft, published, completed] }
+    Registration:
+      type: object
+      required: [id, eventId, name, email, status, createdAt]
+      properties:
+        id: { type: integer }
+        eventId: { type: integer }
+        name: { type: string }
+        email: { type: string, format: email }
+        status: { type: string, enum: [confirmed, waitlisted, cancelled] }
+        createdAt: { type: string, format: date-time }
+    RegistrationInput:
+      type: object
+      required: [eventId, name, email]
+      properties:
+        eventId: { type: integer }
+        name: { type: string, minLength: 2 }
+        email: { type: string, format: email }
+    Donation:
+      type: object
+      required: [id, eventId, donorName, amount, createdAt]
+      properties:
+        id: { type: integer }
+        eventId: { type: integer }
+        donorName: { type: string }
+        amount: { type: number, minimum: 1 }
+        note: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+    DonationInput:
+      type: object
+      required: [eventId, donorName, amount]
+      properties:
+        eventId: { type: integer }
+        donorName: { type: string, minLength: 2 }
+        amount: { type: number, minimum: 1 }
+        note: { type: ["string", "null"] }
+    AnalyticsOverview:
+      type: object
+      required: [totalEvents, upcomingEvents, totalRegistrations, registrationChange, totalRaised, goalProgress, averageAttendance]
+      properties:
+        totalEvents: { type: integer }
+        upcomingEvents: { type: integer }
+        totalRegistrations: { type: integer }
+        registrationChange: { type: number }
+        totalRaised: { type: number }
+        goalProgress: { type: number }
+        averageAttendance: { type: number }
+    Activity:
+      type: object
+      required: [id, type, message, createdAt]
+      properties:
+        id: { type: integer }
+        type: { type: string, enum: [registration, donation, event, notification] }
+        message: { type: string }
+        createdAt: { type: string, format: date-time }
+    NotificationPreferences:
+      type: object
+      required: [emailReminders, registrationAlerts, donationUpdates, weeklyDigest]
+      properties:
+        emailReminders: { type: boolean }
+        registrationAlerts: { type: boolean }
+        donationUpdates: { type: boolean }
+        weeklyDigest: { type: boolean }
+    NotificationPreferencesUpdate:
+      type: object
+      properties:
+        emailReminders: { type: boolean }
+        registrationAlerts: { type: boolean }
+        donationUpdates: { type: boolean }
+        weeklyDigest: { type: boolean }
+
