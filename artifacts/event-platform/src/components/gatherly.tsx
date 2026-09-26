@@ -7,9 +7,9 @@ const formatDate = (value: string, options?: Intl.DateTimeFormatOptions) =>
   new Intl.DateTimeFormat('en-US', options ?? { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value));
 
 export function Logo() {
-  return <Link href="/" data-testid="link-logo" className="flex items-center gap-2.5 text-inherit">
-    <span className="grid size-9 place-items-center rounded-[11px] bg-primary text-accent shadow-sm"><Sparkles size={17} strokeWidth={2.5} /></span>
-    <span className="font-display text-[20px] font-bold tracking-[-.04em]">ICGA<span className="text-accent">.</span></span>
+  return <Link href="/" data-testid="link-logo" className="flex shrink-0 items-center gap-2 text-inherit sm:gap-2.5">
+    <span className="grid size-8 place-items-center rounded-[11px] bg-primary text-accent shadow-sm sm:size-9"><Sparkles size={16} strokeWidth={2.5} /></span>
+    <span className="font-display text-[18px] font-bold tracking-[-.04em] sm:text-[20px]">ICGA<span className="text-accent">.</span></span>
   </Link>;
 }
 
@@ -42,18 +42,18 @@ export function AppShell({ children }: { children: ReactNode }) {
         <p className="mt-1 text-xs leading-5 text-sidebar-foreground/60">Programs made easy, community impact made visible.</p>
       </div>
     </aside>
-    <header className="sticky top-0 z-20 flex h-[70px] items-center justify-between border-b border-border/80 bg-background/90 px-5 backdrop-blur lg:hidden">
+    <header className="sticky top-0 z-20 flex h-[62px] items-center justify-between border-b border-border/80 bg-background/90 px-4 pt-[env(safe-area-inset-top)] backdrop-blur sm:h-[70px] sm:px-5 lg:hidden">
       <Logo />
       <button type="button" aria-label="Open navigation" data-testid="button-open-navigation" onClick={() => setMobileOpen(true)} className="rounded-lg p-2 hover:bg-muted"><Menu size={20} /></button>
     </header>
     {mobileOpen && <div className="fixed inset-0 z-40 bg-primary/20 backdrop-blur-sm lg:hidden" onClick={() => setMobileOpen(false)}><div className="h-full w-[280px] bg-sidebar p-5 text-sidebar-foreground" onClick={(event) => event.stopPropagation()}><div className="flex items-center justify-between"><Logo /><button type="button" data-testid="button-close-navigation" aria-label="Close navigation" onClick={() => setMobileOpen(false)} className="rounded-lg p-2 text-sidebar-foreground/70 hover:bg-sidebar-accent"><X size={19} /></button></div><nav className="mt-12 space-y-1">{nav.map(({ href, label, icon: Icon }) => <Link key={href} href={href} onClick={() => setMobileOpen(false)} data-testid={`link-mobile-nav-${label.toLowerCase().replace(' ', '-')}`} className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-sidebar-foreground/75 hover:bg-sidebar-accent"><Icon size={17} />{label}</Link>)}</nav></div></div>}
-    <main className="lg:pl-[246px]"><div className="mx-auto max-w-[1440px] px-5 py-7 sm:px-8 lg:px-12 lg:py-10">{children}</div></main>
+    <main className="lg:pl-[246px]"><div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-8 sm:py-7 lg:px-12 lg:py-10">{children}</div></main>
   </div>;
 }
 
 export function PageHeading({ eyebrow, title, description, action }: { eyebrow?: string; title: string; description?: string; action?: ReactNode }) {
   return <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-    <div><p className="mb-2 font-mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">{eyebrow ?? 'ICGA Austin'}</p><h1 className="font-display text-4xl font-bold tracking-[-.055em] text-foreground sm:text-[46px]">{title}</h1>{description && <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{description}</p>}</div>
+    <div className="min-w-0"><p className="mb-2 font-mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">{eyebrow ?? 'ICGA Austin'}</p><h1 className="font-display text-[1.75rem] font-bold tracking-[-.055em] text-balance break-words text-foreground sm:text-4xl lg:text-[46px]">{title}</h1>{description && <p className="mt-2 max-w-2xl break-words text-sm leading-6 text-muted-foreground">{description}</p>}</div>
     {action}
   </div>;
 }
@@ -76,8 +76,8 @@ export function ErrorState({ onRetry }: { onRetry: () => void }) { return <div c
 
 export function EventCard({ event, compact = false }: { event: Event; compact?: boolean }) {
   const fill = event.capacity ? Math.min(100, Math.round((event.registeredCount / event.capacity) * 100)) : 0;
-  return <Link href={`/events/${event.id}`} data-testid={`card-event-${event.id}`} className={`group block overflow-hidden rounded-2xl border border-card-border bg-card shadow-xs hover:-translate-y-1 hover:shadow-md ${compact ? 'grid grid-cols-[116px_1fr] sm:grid-cols-[150px_1fr]' : ''}`}>
-    <div className={`relative overflow-hidden ${compact ? 'min-h-[138px]' : 'aspect-[1.65/1]'}`} style={{ background: `linear-gradient(135deg, hsl(${(event.id * 43) % 360} 42% 34%), hsl(${((event.id * 43) + 55) % 360} 50% 70%))` }}>
+  return <Link href={`/events/${event.id}`} data-testid={`card-event-${event.id}`} className={`group block overflow-hidden rounded-2xl border border-card-border bg-card shadow-xs hover:-translate-y-1 hover:shadow-md ${compact ? 'grid grid-cols-1 min-[420px]:grid-cols-[116px_1fr] sm:grid-cols-[150px_1fr]' : ''}`}>
+    <div className={`relative overflow-hidden ${compact ? 'aspect-[16/9] min-h-[120px] min-[420px]:aspect-auto min-[420px]:min-h-[138px]' : 'aspect-[1.65/1]'}`} style={{ background: `linear-gradient(135deg, hsl(${(event.id * 43) % 360} 42% 34%), hsl(${((event.id * 43) + 55) % 360} 50% 70%))` }}>
       {event.imageUrl ? <img src={event.imageUrl} alt={event.title} className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105" /> : <div className="absolute inset-0 p-4 text-right font-display text-5xl font-bold text-white/20">{String(event.title).slice(0, 1)}</div>}
       <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[.14em] text-foreground">{event.category}</span>
     </div>

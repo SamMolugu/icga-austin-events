@@ -73,6 +73,10 @@ Create an organizer account at `/sign-up`. Signed-in organizers can open the das
 ```bash
 pnpm run typecheck
 pnpm --filter @workspace/event-platform run build
+pnpm --filter @workspace/scripts run test:images
+# Against a running local stack:
+pnpm --filter @workspace/scripts run test
+pnpm --filter @workspace/scripts run test:responsive
 ```
 
 ## Project structure

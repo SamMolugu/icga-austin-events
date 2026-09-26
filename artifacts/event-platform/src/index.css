@@ -262,8 +262,23 @@
     @apply border-border;
   }
 
+  html {
+    overflow-x: clip;
+  }
+
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    overflow-x: clip;
+    overflow-wrap: break-word;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
   }
 }
 
@@ -288,7 +303,13 @@ body {
     radial-gradient(1200px 640px at 8% -10%, hsl(169 36% 22% / .12), transparent 58%),
     radial-gradient(900px 520px at 100% 8%, hsl(37 88% 65% / .16), transparent 50%);
   background-size: auto, 180px 180px, auto, auto;
-  background-attachment: fixed;
+  background-attachment: scroll;
+}
+
+@media (min-width: 1024px) {
+  body {
+    background-attachment: fixed;
+  }
 }
 button, a, input, textarea, select { transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, transform 180ms ease, opacity 180ms ease; }
 button:active, a:active { transform: translateY(1px); }

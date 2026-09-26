@@ -5,7 +5,13 @@
   "type": "module",
   "scripts": {
     "hello": "tsx ./src/hello.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:images": "node --test ./src/image-pool.test.mjs",
+    "test:api": "node ./src/verify-release.mjs",
+    "test:db": "node ./src/verify-db.mjs",
+    "test:ui": "node ./src/verify-ui.mjs",
+    "test:responsive": "node ./src/verify-responsive.mjs",
+    "test": "node --test ./src/image-pool.test.mjs && node ./src/verify-release.mjs && node ./src/verify-db.mjs && node ./src/verify-ui.mjs && node ./src/verify-responsive.mjs"
   },
   "devDependencies": {
     "@types/node": "catalog:",
