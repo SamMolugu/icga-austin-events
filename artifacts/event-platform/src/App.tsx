@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ClerkProvider, RedirectToSignIn, Show, SignIn, SignUp, useUser } from '@clerk/react';
+import { ClerkProvider, RedirectToSignIn, Show, SignIn, SignUp } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -30,12 +30,6 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 function AdminRoute({ children }: { children: ReactNode }) {
   return <><Show when="signed-in">{children}</Show><Show when="signed-out"><RedirectToSignIn /></Show></>;
-}
-
-function AccountBadge() {
-  const { user } = useUser();
-  if (!user) return null;
-  return <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-primary">{user.firstName ?? user.emailAddresses[0]?.emailAddress ?? 'Demo admin'}</span>;
 }
 
 function Router() {

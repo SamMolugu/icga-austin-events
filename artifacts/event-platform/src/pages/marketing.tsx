@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarDays, Check, Megaphone, Plus, Trash2 } from 'lucide-react';
-import { getListEventsQueryKey, useListEvents } from '@workspace/api-client-react';
+import { getListOrganizerEventsQueryKey, useListOrganizerEvents } from '@workspace/api-client-react';
 import { AppShell, Button, EmptyState, ErrorState, Field, PageHeading, Skeleton, inputClass } from '@/components/gatherly';
 
 type Plan = { id: number; eventId: number; channel: string; status: string; publishAt: string | null; copy: string; ownerName: string | null };
 const channels = ['Email', 'Instagram', 'Facebook', 'WhatsApp', 'Website'];
 
 export default function Marketing() {
-  const eventsQuery = useListEvents(undefined, { query: { queryKey: getListEventsQueryKey() } });
+  const eventsQuery = useListOrganizerEvents(undefined, { query: { queryKey: getListOrganizerEventsQueryKey() } });
   const events = eventsQuery.data ?? [];
   const [eventId, setEventId] = useState('');
   const [plans, setPlans] = useState<Plan[]>([]);

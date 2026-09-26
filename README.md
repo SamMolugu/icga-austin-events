@@ -92,6 +92,7 @@ Dockerfile          Multi-stage API container
 The main API routes are:
 
 - `GET /api/events`
+- `GET /api/organizer/events` (organizer-only; drafts, published, and completed)
 - `POST /api/events`
 - `GET /api/events/:eventId`
 - `PATCH /api/events/:eventId`
@@ -137,18 +138,50 @@ Set `GITHUB_WEBHOOK_SECRET` in the deployment environment. The receiver validate
 
 ## Container build
 
-The API has a multi-stage production container:
+The production image serves the website and the API on one port. Postgres stays outside the image.
+
+```bash
+cp .env.example .env
+# Fill in the passwords and Clerk keys in .env, then:
+docker compose up --build
+```
+
+The app listens at `http://localhost:5000`. Compose applies the database schema before the app starts, and an empty database is seeded with the ICGA calendar.
+
+To build the image by itself:
 
 ```bash
 docker build -t icga-austin-events .
 docker run --rm -p 5000:5000 \
+  -e PORT=5000 \
   -e DATABASE_URL="$DATABASE_URL" \
   -e SESSION_SECRET="$SESSION_SECRET" \
+  -e CLERK_PUBLISHABLE_KEY="$CLERK_PUBLISHABLE_KEY" \
+  -e CLERK_SECRET_KEY="$CLERK_SECRET_KEY" \
   -e GITHUB_WEBHOOK_SECRET="$GITHUB_WEBHOOK_SECRET" \
+  -e CLIENT_DIST=/app/client \
   icga-austin-events
 ```
 
-For a public deployment, use a managed PostgreSQL database and a container host that supports HTTPS, environment secrets, and health checks. The app is designed to keep application state in PostgreSQL so it can scale beyond the first 100 community users.
+Clerk keys used by the browser are baked in at image build time. Pass them as build args when the image is built for a public host:
+
+```bash
+docker build -t icga-austin-events \
+  --build-arg VITE_CLERK_PUBLISHABLE_KEY="$VITE_CLERK_PUBLISHABLE_KEY" \
+  --build-arg VITE_CLERK_PROXY_URL="$VITE_CLERK_PROXY_URL" \
+  .
+```
+
+## Releases and Replit
+
+Updates ship from a `release/*` branch. Open a pull request into `main`. CI builds the Docker image on that pull request and again when the branch lands on `main`. A push to `main` is what publishes the Replit deployment. Do not push release work straight to `main`.
+
+Before the first production deploy, connect this GitHub repository to the Replit app and add these secrets to the GitHub `production` environment:
+
+- `REPLIT_REPL_ID`
+- `REPLIT_DEPLOY_TOKEN` from [replit.com/account](https://replit.com/account#api-tokens)
+
+The deploy workflow reads those secrets at runtime. They are not stored in the repository.
 
 ## Publishing and custom URL
 
@@ -163,7 +196,7 @@ Before publishing:
 
 ## Current ICGA calendar seed
 
-The demo database is seeded from the official ICGA event calendar at [austinmosque.org/calendar](https://austinmosque.org/calendar), including:
+The demo database is seeded on API startup when the events table is empty, using programs from the official ICGA event calendar at [austinmosque.org/calendar](https://austinmosque.org/calendar), including:
 
 - Sisters’ Circle With Imam Dawood
 - Brothers Quran Halaqa

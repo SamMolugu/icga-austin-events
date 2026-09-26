@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, ilike, or } from "drizzle-orm";
+import { and, asc, desc, eq, gte, ilike, lt, or } from "drizzle-orm";
 import { Router, type IRouter } from "express";
 import { db, eventsTable, activityTable } from "@workspace/db";
 import {
@@ -8,6 +8,8 @@ import {
   GetEventResponse,
   ListEventsQueryParams,
   ListEventsResponse,
+  ListOrganizerEventsQueryParams,
+  ListOrganizerEventsResponse,
   UpdateEventBody,
   UpdateEventParams,
   UpdateEventResponse,
@@ -32,13 +34,30 @@ router.get("/events", async (req, res): Promise<void> => {
     filters.push(or(ilike(eventsTable.title, `%${search}%`), ilike(eventsTable.description, `%${search}%`)));
   }
   const now = new Date();
-  filters.push(timeframe === "past" ? eq(eventsTable.status, "completed") : eq(eventsTable.status, "published"));
+  filters.push(timeframe === "past"
+    ? or(eq(eventsTable.status, "completed"), and(eq(eventsTable.status, "published"), lt(eventsTable.endsAt, now)))
+    : and(eq(eventsTable.status, "published"), gte(eventsTable.endsAt, now)));
   const events = await db
     .select()
     .from(eventsTable)
     .where(and(...filters))
     .orderBy(timeframe === "past" ? desc(eventsTable.startsAt) : asc(eventsTable.startsAt));
   res.json(ListEventsResponse.parse(events));
+});
+
+router.get("/organizer/events", requireAuth, async (req, res): Promise<void> => {
+  const parsed = ListOrganizerEventsQueryParams.safeParse(req.query);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  const { status } = parsed.data;
+  const events = await db
+    .select()
+    .from(eventsTable)
+    .where(status ? eq(eventsTable.status, status) : undefined)
+    .orderBy(desc(eventsTable.startsAt));
+  res.json(ListOrganizerEventsResponse.parse(events));
 });
 
 router.post("/events", requireAuth, async (req, res): Promise<void> => {

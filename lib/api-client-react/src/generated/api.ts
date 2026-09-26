@@ -31,6 +31,7 @@ import type {
   HealthStatus,
   ListDonationsParams,
   ListEventsParams,
+  ListOrganizerEventsParams,
   NotFoundResponse,
   NotificationPreferences,
   NotificationPreferencesUpdate,
@@ -226,6 +227,40 @@ export function useListEvents<TData = Awaited<ReturnType<typeof listEvents>>, TE
 
 
 
+
+export const getListOrganizerEventsUrl = (params?: ListOrganizerEventsParams,) => {
+  const normalizedParams = new URLSearchParams();
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+  const stringifiedParams = normalizedParams.toString();
+  return stringifiedParams.length > 0 ? `/api/organizer/events?${stringifiedParams}` : `/api/organizer/events`
+}
+
+export const listOrganizerEvents = async (params?: ListOrganizerEventsParams, options?: Parameters<typeof customFetch>[1]): Promise<Event[]> => {
+  return customFetch<Event[]>(getListOrganizerEventsUrl(params), { ...options, method: 'GET' });
+}
+
+export const getListOrganizerEventsQueryKey = (params?: ListOrganizerEventsParams,) => {
+  return [`/api/organizer/events`, ...(params ? [params] : [])] as const;
+}
+
+export const getListOrganizerEventsQueryOptions = <TData = Awaited<ReturnType<typeof listOrganizerEvents>>, TError = ErrorType<unknown>>(params?: ListOrganizerEventsParams, options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof listOrganizerEvents>>, TError, TData>, request?: SecondParameter<typeof customFetch> }) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getListOrganizerEventsQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listOrganizerEvents>>> = ({ signal }) => listOrganizerEvents(params, { signal, ...requestOptions });
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof listOrganizerEvents>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export function useListOrganizerEvents<TData = Awaited<ReturnType<typeof listOrganizerEvents>>, TError = ErrorType<unknown>>(
+  params?: ListOrganizerEventsParams, options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof listOrganizerEvents>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListOrganizerEventsQueryOptions(params, options)
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  return withQueryKey(query, queryOptions.queryKey);
+}
 
 export const getCreateEventUrl = () => {
 

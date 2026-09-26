@@ -21,6 +21,8 @@ export * from './healthStatus';
 export * from './listDonationsParams';
 export * from './listEventsParams';
 export * from './listEventsTimeframe';
+export * from './listOrganizerEventsParams';
+export * from './listOrganizerEventsStatus';
 export * from './notFoundResponse';
 export * from './notificationPreferences';
 export * from './notificationPreferencesUpdate';

@@ -47,3 +47,8 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Local secrets. Copy .env.example to .env.
+.env
+.env.*
+!.env.example

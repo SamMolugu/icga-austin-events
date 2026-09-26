@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Edit3, ExternalLink, Filter, Plus, Save, X } from 'lucide-react';
 import { Link } from 'wouter';
-import { getListEventsQueryKey, useCreateEvent, useListEvents, useUpdateEvent, type Event } from '@workspace/api-client-react';
+import { getListOrganizerEventsQueryKey, useCreateEvent, useListOrganizerEvents, useUpdateEvent, type Event } from '@workspace/api-client-react';
 import { AppShell, Button, EmptyState, ErrorState, Field, PageHeading, Skeleton, inputClass } from '@/components/gatherly';
 
 type EventForm = { title: string; description: string; category: string; startsAt: string; endsAt: string; location: string; imageUrl: string; capacity: string; charityName: string; charityGoal: string };
@@ -9,7 +9,7 @@ const blank: EventForm = { title: '', description: '', category: 'Community', st
 const toForm = (event: Event): EventForm => ({ title: event.title, description: event.description, category: event.category, startsAt: event.startsAt.slice(0, 16), endsAt: event.endsAt.slice(0, 16), location: event.location, imageUrl: event.imageUrl ?? '', capacity: String(event.capacity), charityName: event.charityName, charityGoal: String(event.charityGoal) });
 
 export default function ManageEvents() {
-  const eventsQuery = useListEvents(undefined, { query: { queryKey: getListEventsQueryKey() } });
+  const eventsQuery = useListOrganizerEvents(undefined, { query: { queryKey: getListOrganizerEventsQueryKey() } });
   const create = useCreateEvent();
   const update = useUpdateEvent();
   const [editing, setEditing] = useState<Event | null>(null);

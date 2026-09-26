@@ -1,3 +1,4 @@
+import path from "node:path";
 import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
@@ -40,5 +41,24 @@ app.use(
 );
 
 app.use("/api", router);
+
+const clientDist = process.env.CLIENT_DIST;
+if (clientDist) {
+  const clientRoot = path.resolve(clientDist);
+  app.use(express.static(clientRoot, { index: false, fallthrough: true }));
+  app.use((req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      next();
+      return;
+    }
+    if (req.path.startsWith("/api")) {
+      next();
+      return;
+    }
+    res.sendFile(path.join(clientRoot, "index.html"), (err) => {
+      if (err) next(err);
+    });
+  });
+}
 
 export default app;

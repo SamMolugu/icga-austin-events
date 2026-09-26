@@ -193,6 +193,19 @@ export const ListEventsTimeframe = {
   past: 'past',
 } as const;
 
+export type ListOrganizerEventsParams = {
+status?: ListOrganizerEventsStatus;
+};
+
+export type ListOrganizerEventsStatus = typeof ListOrganizerEventsStatus[keyof typeof ListOrganizerEventsStatus];
+
+
+export const ListOrganizerEventsStatus = {
+  draft: 'draft',
+  published: 'published',
+  completed: 'completed',
+} as const;
+
 export type ListDonationsParams = {
 eventId?: number;
 };
