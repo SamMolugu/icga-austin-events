@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import { ArrowUpRight, HeartHandshake, Plus, ReceiptText } from 'lucide-react';
-import { getListDonationsQueryKey, getListEventsQueryKey, useCreateDonation, useListDonations, useListEvents } from '@workspace/api-client-react';
+import { getListDonationsQueryKey, getListOrganizerEventsQueryKey, useCreateDonation, useListDonations, useListOrganizerEvents } from '@workspace/api-client-react';
 import { AppShell, Button, EmptyState, ErrorState, Field, PageHeading, Skeleton, inputClass } from '@/components/gatherly';
 
 export default function Donations() {
   const donationsQuery = useListDonations(undefined, { query: { queryKey: getListDonationsQueryKey() } });
-  const eventsQuery = useListEvents(undefined, { query: { queryKey: getListEventsQueryKey() } });
+  const eventsQuery = useListOrganizerEvents(undefined, { query: { queryKey: getListOrganizerEventsQueryKey() } });
   const create = useCreateDonation();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ eventId: '', donorName: '', amount: '', note: '' });

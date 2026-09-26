@@ -1,0 +1,40 @@
+name: Deploy to Replit
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: replit-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Publish production
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Require production secrets
+        env:
+          REPLIT_REPL_ID: ${{ secrets.REPLIT_REPL_ID }}
+          REPLIT_DEPLOY_TOKEN: ${{ secrets.REPLIT_DEPLOY_TOKEN }}
+        run: |
+          if [ -z "$REPLIT_REPL_ID" ] || [ -z "$REPLIT_DEPLOY_TOKEN" ]; then
+            echo "::error::Production deploy is blocked until REPLIT_REPL_ID and REPLIT_DEPLOY_TOKEN are set on the production environment. Connect this GitHub repo to the Replit app, create a token at https://replit.com/account#api-tokens, and store both values as environment secrets. Do not put the token in the repository."
+            exit 1
+          fi
+
+      - name: Trigger the Replit deployment
+        env:
+          REPLIT_REPL_ID: ${{ secrets.REPLIT_REPL_ID }}
+          REPLIT_DEPLOY_TOKEN: ${{ secrets.REPLIT_DEPLOY_TOKEN }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer ${REPLIT_DEPLOY_TOKEN}" \
+            --header "Accept: application/json" \
+            "https://replit.com/api/v1/repls/${REPLIT_REPL_ID}/deployments"

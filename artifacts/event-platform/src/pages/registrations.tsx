@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, Mail, UsersRound } from 'lucide-react';
-import { getListEventsQueryKey, useListEvents, type Event } from '@workspace/api-client-react';
+import { getListOrganizerEventsQueryKey, useListOrganizerEvents, type Event } from '@workspace/api-client-react';
 import { AppShell, EmptyState, ErrorState, Field, PageHeading, Skeleton, inputClass } from '@/components/gatherly';
 
 type Registration = { id: number; eventId: number; name: string; email: string; status: string; createdAt: string };
 
 export default function Registrations() {
-  const eventsQuery = useListEvents(undefined, { query: { queryKey: getListEventsQueryKey() } });
+  const eventsQuery = useListOrganizerEvents(undefined, { query: { queryKey: getListOrganizerEventsQueryKey() } });
   const events = eventsQuery.data ?? [];
   const [eventId, setEventId] = useState('');
   const [rows, setRows] = useState<Registration[]>([]);

@@ -118,6 +118,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Event"
+  /organizer/events:
+    get:
+      operationId: listOrganizerEvents
+      tags: [events]
+      summary: List every event for the organizer desk
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [draft, published, completed]
+      responses:
+        "200":
+          description: Events including drafts and completed programs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
   /registrations:
     post:
       operationId: createRegistration

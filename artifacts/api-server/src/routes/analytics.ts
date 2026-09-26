@@ -1,4 +1,4 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { Router, type IRouter } from "express";
 import { db, activityTable, donationsTable, eventsTable, registrationsTable, notificationPreferencesTable } from "@workspace/db";
 import {
@@ -14,7 +14,8 @@ const router: IRouter = Router();
 
 router.get("/analytics/overview", requireAuth, async (_req, res): Promise<void> => {
   const [{ count: totalEvents }] = await db.select({ count: sql<number>`count(*)` }).from(eventsTable);
-  const [{ count: upcomingEvents }] = await db.select({ count: sql<number>`count(*)` }).from(eventsTable).where(eq(eventsTable.status, "published"));
+  const now = new Date();
+  const [{ count: upcomingEvents }] = await db.select({ count: sql<number>`count(*)` }).from(eventsTable).where(and(eq(eventsTable.status, "published"), gte(eventsTable.endsAt, now)));
   const [row] = await db.select({
     totalCapacity: sql<number>`coalesce(sum(${eventsTable.capacity}), 0)`,
     totalRegistered: sql<number>`coalesce(sum(${eventsTable.registeredCount}), 0)`,

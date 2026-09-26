@@ -47,6 +47,15 @@ export const ListEventsResponseItem = zod.object({
 })
 export const ListEventsResponse = zod.array(ListEventsResponseItem)
 
+/**
+ * @summary List every event for the organizer desk
+ */
+export const ListOrganizerEventsQueryParams = zod.object({
+  "status": zod.enum(['draft', 'published', 'completed']).optional()
+})
+
+export const ListOrganizerEventsResponse = zod.array(ListEventsResponseItem)
+
 
 /**
  * @summary Create an event
