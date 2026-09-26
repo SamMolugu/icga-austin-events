@@ -16,6 +16,8 @@ import Donations from '@/pages/donations';
 import Notifications from '@/pages/notifications';
 import Marketing from '@/pages/marketing';
 import Registrations from '@/pages/registrations';
+import Flyers from '@/pages/flyers';
+import Impact from '@/pages/impact';
 import {
   Route,
   Switch,
@@ -29,6 +31,7 @@ const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 function AdminRoute({ children }: { children: ReactNode }) {
+  if (!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY) return <>{children}</>;
   return <><Show when="signed-in">{children}</Show><Show when="signed-out"><RedirectToSignIn /></Show></>;
 }
 
@@ -39,12 +42,14 @@ function Router() {
     <RoutedErrorBoundary>
       <Switch>
          <Route path="/" component={Home} />
+         <Route path="/impact" component={Impact} />
          <Route path="/events/manage" component={() => <AdminRoute><ManageEvents /></AdminRoute>} />
          <Route path="/events/:eventId" component={EventDetail} />
          <Route path="/register/:registrationId" component={RegistrationConfirmation} />
          <Route path="/dashboard" component={() => <AdminRoute><Dashboard /></AdminRoute>} />
          <Route path="/donations" component={() => <AdminRoute><Donations /></AdminRoute>} />
          <Route path="/registrations" component={() => <AdminRoute><Registrations /></AdminRoute>} />
+         <Route path="/flyers" component={() => <AdminRoute><Flyers /></AdminRoute>} />
          <Route path="/marketing" component={() => <AdminRoute><Marketing /></AdminRoute>} />
          <Route path="/settings/notifications" component={() => <AdminRoute><Notifications /></AdminRoute>} />
          <Route path="/sign-in/*?" component={() => <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4"><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} /></div>} />

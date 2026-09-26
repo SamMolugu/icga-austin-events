@@ -4,15 +4,18 @@ ICGA Austin Events is a community scheduling and registration platform for the I
 
 ## What it includes
 
-- Public ICGA event calendar with search and category filters
-- Event detail pages with registration and capacity-aware waitlists
-- Registration confirmation pages
+- Public ICGA event calendar with search, category filters, event photos, and a geometric page background
+- Event detail pages with registration, approved flyers, and capacity-aware waitlists
+- Registration confirmation pages with ticket codes
+- Public impact page for program giving, campus development, tickets, and recent gifts
 - Clerk-powered sign-in/sign-up with organizer-only access to the admin workspace
 - Organizer dashboard with attendance, registration, giving, and activity metrics
+- Ticket tracker with unique codes, headcount, waitlist, and door check-in
+- Flyer inbox for submitting, approving, or sending artwork back
 - Attendance workspace with attendee lists, confirmed headcount, capacity usage, and waitlist counts
 - Event creation, editing, publishing, and completion
 - Marketing planner with event-linked email, social, WhatsApp, and website touchpoints
-- Donation ledger with charity and community-fund tracking
+- Donation ledger plus public program and development funds
 - Notification preference controls for reminders, registration alerts, giving updates, and weekly summaries
 - Signed GitHub webhook receiver at `POST /api/webhooks/github`
 - OpenAPI-first API with generated React Query hooks and Zod validation
@@ -101,6 +104,13 @@ The main API routes are:
 - `GET /api/registrations?eventId=:eventId` (organizer-only attendee list)
 - `GET /api/donations`
 - `POST /api/donations`
+- `GET /api/impact`
+- `GET /api/funds`
+- `POST /api/funds/:fundId/gifts` (organizer-only)
+- `GET /api/flyers`
+- `POST /api/flyers` (organizer-only)
+- `PATCH /api/flyers/:flyerId` (organizer-only)
+- `POST /api/registrations/:registrationId/check-in` (organizer-only)
 - `GET /api/analytics/overview`
 - `GET /api/analytics/activity`
 - `GET /api/notifications/preferences`

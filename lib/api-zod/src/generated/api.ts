@@ -195,6 +195,8 @@ export const CreateRegistrationResponse = zod.object({
   "name": zod.string(),
   "email": zod.string().email(),
   "status": zod.enum(['confirmed', 'waitlisted', 'cancelled']),
+  "ticketCode": zod.string().nullish(),
+  "checkedInAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date()
 })
 
@@ -212,7 +214,93 @@ export const GetRegistrationResponse = zod.object({
   "name": zod.string(),
   "email": zod.string().email(),
   "status": zod.enum(['confirmed', 'waitlisted', 'cancelled']),
+  "ticketCode": zod.string().nullish(),
+  "checkedInAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date()
+})
+
+export const ListRegistrationsQueryParams = zod.object({
+  "eventId": zod.coerce.number().int()
+})
+export const ListRegistrationsResponse = zod.array(GetRegistrationResponse)
+
+export const CheckInRegistrationParams = zod.object({
+  "registrationId": zod.coerce.number().int()
+})
+export const CheckInRegistrationResponse = GetRegistrationResponse
+
+export const ListFlyersQueryParams = zod.object({
+  "eventId": zod.coerce.number().int().optional(),
+  "status": zod.enum(['pending', 'approved', 'rejected']).optional()
+})
+export const FlyerItem = zod.object({
+  "id": zod.number().int(),
+  "eventId": zod.number().int(),
+  "title": zod.string(),
+  "imageUrl": zod.string(),
+  "submittedBy": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
+  "reviewNote": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "reviewedAt": zod.coerce.date().nullish()
+})
+export const ListFlyersResponse = zod.array(FlyerItem)
+export const CreateFlyerBody = zod.object({
+  "eventId": zod.number().int(),
+  "title": zod.string().min(2),
+  "imageUrl": zod.string().min(8),
+  "submittedBy": zod.string().min(2)
+})
+export const CreateFlyerResponse = FlyerItem
+export const UpdateFlyerParams = zod.object({
+  "flyerId": zod.coerce.number().int()
+})
+export const UpdateFlyerBody = zod.object({
+  "status": zod.enum(['approved', 'rejected']),
+  "reviewNote": zod.string().nullish()
+})
+export const UpdateFlyerResponse = FlyerItem
+
+export const FundItem = zod.object({
+  "id": zod.number().int(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "kind": zod.enum(['program', 'development']),
+  "description": zod.string(),
+  "goal": zod.number(),
+  "raised": zod.number()
+})
+export const ListFundsResponse = zod.array(FundItem)
+export const CreateFundGiftParams = zod.object({
+  "fundId": zod.coerce.number().int()
+})
+export const CreateFundGiftBody = zod.object({
+  "donorName": zod.string().min(2),
+  "amount": zod.number().min(1),
+  "note": zod.string().nullish()
+})
+export const CreateFundGiftResponse = FundItem
+
+export const GetImpactResponse = zod.object({
+  "totalRaised": zod.number(),
+  "programRaised": zod.number(),
+  "developmentRaised": zod.number(),
+  "ticketsIssued": zod.number().int(),
+  "ticketsCheckedIn": zod.number().int(),
+  "upcomingEvents": zod.number().int(),
+  "funds": zod.array(zod.object({
+    "id": zod.number().int(),
+    "name": zod.string(),
+    "kind": zod.enum(['program', 'development']),
+    "description": zod.string(),
+    "goal": zod.number(),
+    "raised": zod.number()
+  })),
+  "recentGifts": zod.array(zod.object({
+    "amount": zod.number(),
+    "fundName": zod.string(),
+    "createdAt": zod.coerce.date()
+  }))
 })
 
 

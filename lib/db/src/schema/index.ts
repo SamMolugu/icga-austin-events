@@ -23,3 +23,5 @@ export * from "./donations";
 export * from "./activity";
 export * from "./notification-preferences";
 export * from "./marketing-plans";
+export * from "./flyers";
+export * from "./funds";

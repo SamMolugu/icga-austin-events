@@ -20,6 +20,12 @@ tags:
     description: Organizer metrics and activity
   - name: notifications
     description: Event notification preferences
+  - name: flyers
+    description: Event flyer review and approval
+  - name: funds
+    description: Community and development funds
+  - name: impact
+    description: Public giving and development metrics
 paths:
   /healthz:
     get:
@@ -140,6 +146,25 @@ paths:
                 items:
                   $ref: "#/components/schemas/Event"
   /registrations:
+    get:
+      operationId: listRegistrations
+      tags: [registrations]
+      summary: List tickets for an event
+      parameters:
+        - name: eventId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Tickets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Registration"
     post:
       operationId: createRegistration
       tags: [registrations]
@@ -177,6 +202,137 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Registration"
+  /registrations/{registrationId}/check-in:
+    post:
+      operationId: checkInRegistration
+      tags: [registrations]
+      summary: Check in a ticket
+      parameters:
+        - $ref: "#/components/parameters/RegistrationId"
+      responses:
+        "200":
+          description: Checked-in ticket
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registration"
+  /flyers:
+    get:
+      operationId: listFlyers
+      tags: [flyers]
+      summary: List event flyers
+      parameters:
+        - name: eventId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+      responses:
+        "200":
+          description: Flyers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Flyer"
+    post:
+      operationId: createFlyer
+      tags: [flyers]
+      summary: Submit a flyer for approval
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FlyerInput"
+      responses:
+        "201":
+          description: Flyer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Flyer"
+  /flyers/{flyerId}:
+    patch:
+      operationId: updateFlyer
+      tags: [flyers]
+      summary: Approve or reject a flyer
+      parameters:
+        - name: flyerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FlyerUpdate"
+      responses:
+        "200":
+          description: Flyer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Flyer"
+  /funds:
+    get:
+      operationId: listFunds
+      tags: [funds]
+      summary: List community and development funds
+      responses:
+        "200":
+          description: Funds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Fund"
+  /funds/{fundId}/gifts:
+    post:
+      operationId: createFundGift
+      tags: [funds]
+      summary: Record a gift toward a fund
+      parameters:
+        - name: fundId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FundGiftInput"
+      responses:
+        "201":
+          description: Updated fund
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fund"
+  /impact:
+    get:
+      operationId: getImpact
+      tags: [impact]
+      summary: Public giving, tickets, and development metrics
+      responses:
+        "200":
+          description: Public impact
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Impact"
   /donations:
     get:
       operationId: listDonations
@@ -353,13 +509,15 @@ components:
         status: { type: string, enum: [draft, published, completed] }
     Registration:
       type: object
-      required: [id, eventId, name, email, status, createdAt]
+      required: [id, eventId, name, email, status, ticketCode, createdAt]
       properties:
         id: { type: integer }
         eventId: { type: integer }
         name: { type: string }
         email: { type: string, format: email }
         status: { type: string, enum: [confirmed, waitlisted, cancelled] }
+        ticketCode: { type: string }
+        checkedInAt: { type: ["string", "null"], format: date-time }
         createdAt: { type: string, format: date-time }
     RegistrationInput:
       type: object
@@ -420,4 +578,84 @@ components:
         registrationAlerts: { type: boolean }
         donationUpdates: { type: boolean }
         weeklyDigest: { type: boolean }
+    Flyer:
+      type: object
+      required: [id, eventId, title, imageUrl, submittedBy, status, createdAt]
+      properties:
+        id: { type: integer }
+        eventId: { type: integer }
+        title: { type: string }
+        imageUrl: { type: string }
+        submittedBy: { type: string }
+        status: { type: string, enum: [pending, approved, rejected] }
+        reviewNote: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        reviewedAt: { type: ["string", "null"], format: date-time }
+    FlyerInput:
+      type: object
+      required: [eventId, title, imageUrl, submittedBy]
+      properties:
+        eventId: { type: integer }
+        title: { type: string, minLength: 2 }
+        imageUrl: { type: string, minLength: 8 }
+        submittedBy: { type: string, minLength: 2 }
+    FlyerUpdate:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [approved, rejected] }
+        reviewNote: { type: ["string", "null"] }
+    Fund:
+      type: object
+      required: [id, name, slug, kind, description, goal, raised]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        kind: { type: string, enum: [program, development] }
+        description: { type: string }
+        goal: { type: number }
+        raised: { type: number }
+    FundGiftInput:
+      type: object
+      required: [donorName, amount]
+      properties:
+        donorName: { type: string, minLength: 2 }
+        amount: { type: number, minimum: 1 }
+        note: { type: ["string", "null"] }
+    ImpactFund:
+      type: object
+      required: [id, name, kind, description, goal, raised]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        kind: { type: string, enum: [program, development] }
+        description: { type: string }
+        goal: { type: number }
+        raised: { type: number }
+    ImpactGift:
+      type: object
+      required: [amount, fundName, createdAt]
+      properties:
+        amount: { type: number }
+        fundName: { type: string }
+        createdAt: { type: string, format: date-time }
+    Impact:
+      type: object
+      required: [totalRaised, programRaised, developmentRaised, ticketsIssued, ticketsCheckedIn, upcomingEvents, funds, recentGifts]
+      properties:
+        totalRaised: { type: number }
+        programRaised: { type: number }
+        developmentRaised: { type: number }
+        ticketsIssued: { type: integer }
+        ticketsCheckedIn: { type: integer }
+        upcomingEvents: { type: integer }
+        funds:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImpactFund"
+        recentGifts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImpactGift"
 

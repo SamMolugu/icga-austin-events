@@ -6,6 +6,8 @@ import donationsRouter from "./donations";
 import analyticsRouter from "./analytics";
 import webhooksRouter from "./webhooks";
 import marketingRouter from "./marketing";
+import flyersRouter from "./flyers";
+import impactRouter from "./impact";
 
 const router: IRouter = Router();
 
@@ -16,5 +18,7 @@ router.use(donationsRouter);
 router.use(analyticsRouter);
 router.use(webhooksRouter);
 router.use(marketingRouter);
+router.use(flyersRouter);
+router.use(impactRouter);
 
 export default router;

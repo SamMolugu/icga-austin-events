@@ -1,6 +1,6 @@
 import { type ReactNode, useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { CalendarDays, ChevronRight, Compass, HeartHandshake, LayoutDashboard, ListChecks, MailCheck, Menu, Megaphone, Settings2, Sparkles, X } from 'lucide-react';
+import { CalendarDays, ChevronRight, Compass, HeartHandshake, ImagePlus, LayoutDashboard, ListChecks, MailCheck, Menu, Megaphone, Settings2, Sparkles, X } from 'lucide-react';
 import type { Event } from '@workspace/api-client-react';
 
 const formatDate = (value: string, options?: Intl.DateTimeFormatOptions) =>
@@ -21,10 +21,11 @@ export function AppShell({ children }: { children: ReactNode }) {
     { href: '/events/manage', label: 'My events', icon: ListChecks },
     { href: '/donations', label: 'Giving', icon: HeartHandshake },
     { href: '/marketing', label: 'Marketing', icon: Megaphone },
-    { href: '/registrations', label: 'Attendance', icon: MailCheck },
+    { href: '/registrations', label: 'Tickets', icon: MailCheck },
+    { href: '/flyers', label: 'Flyers', icon: ImagePlus },
     { href: '/settings/notifications', label: 'Preferences', icon: Settings2 },
   ];
-  return <div className="min-h-[100dvh] bg-background text-foreground">
+  return <div className="min-h-[100dvh] bg-transparent text-foreground">
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-[246px] flex-col bg-sidebar px-5 py-6 text-sidebar-foreground lg:flex">
       <Logo />
       <div className="mt-12">
@@ -77,7 +78,7 @@ export function EventCard({ event, compact = false }: { event: Event; compact?: 
   const fill = event.capacity ? Math.min(100, Math.round((event.registeredCount / event.capacity) * 100)) : 0;
   return <Link href={`/events/${event.id}`} data-testid={`card-event-${event.id}`} className={`group block overflow-hidden rounded-2xl border border-card-border bg-card shadow-xs hover:-translate-y-1 hover:shadow-md ${compact ? 'grid grid-cols-[116px_1fr] sm:grid-cols-[150px_1fr]' : ''}`}>
     <div className={`relative overflow-hidden ${compact ? 'min-h-[138px]' : 'aspect-[1.65/1]'}`} style={{ background: `linear-gradient(135deg, hsl(${(event.id * 43) % 360} 42% 34%), hsl(${((event.id * 43) + 55) % 360} 50% 70%))` }}>
-      {event.imageUrl ? <img src={event.imageUrl} alt="" className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105" /> : <div className="absolute inset-0 p-4 text-right font-display text-5xl font-bold text-white/20">{String(event.title).slice(0, 1)}</div>}
+      {event.imageUrl ? <img src={event.imageUrl} alt={event.title} className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105" /> : <div className="absolute inset-0 p-4 text-right font-display text-5xl font-bold text-white/20">{String(event.title).slice(0, 1)}</div>}
       <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[.14em] text-foreground">{event.category}</span>
     </div>
     <div className="p-4 sm:p-5"><div className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.12em] text-muted-foreground"><CalendarDays size={12} className="text-primary" />{formatDate(event.startsAt, { weekday: 'short', month: 'short', day: 'numeric' })}</div><h3 className="font-display text-xl font-bold leading-tight tracking-[-.035em] group-hover:text-primary">{event.title}</h3><p className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">{event.description}</p><div className="mt-4 flex items-center justify-between border-t border-border/70 pt-3 text-xs"><span className="truncate text-muted-foreground">{event.location}</span><span className="flex items-center gap-1 font-bold text-primary">{Math.max(0, event.capacity - event.registeredCount)} seats <ChevronRight size={13} /></span></div>{!compact && <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full rounded-full bg-accent" style={{ width: `${fill}%` }} /></div>}</div>

@@ -281,8 +281,14 @@
 @keyframes soft-pulse { 50% { opacity: .65; } }
 
 body {
-  background-image: radial-gradient(hsl(var(--foreground) / .055) .7px, transparent .7px);
-  background-size: 16px 16px;
+  background-color: hsl(var(--background));
+  background-image:
+    linear-gradient(180deg, hsl(40 45% 96% / .88), hsl(40 45% 96% / .94)),
+    url('/pattern.svg'),
+    radial-gradient(1200px 640px at 8% -10%, hsl(169 36% 22% / .12), transparent 58%),
+    radial-gradient(900px 520px at 100% 8%, hsl(37 88% 65% / .16), transparent 50%);
+  background-size: auto, 180px 180px, auto, auto;
+  background-attachment: fixed;
 }
 button, a, input, textarea, select { transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, transform 180ms ease, opacity 180ms ease; }
 button:active, a:active { transform: translateY(1px); }

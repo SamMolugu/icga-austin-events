@@ -14,6 +14,8 @@ export const registrationsTable = pgTable("registrations", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   status: text("status").notNull().default("confirmed"),
+  ticketCode: text("ticket_code"),
+  checkedInAt: timestamp("checked_in_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
