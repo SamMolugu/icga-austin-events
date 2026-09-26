@@ -8,6 +8,7 @@ import webhooksRouter from "./webhooks";
 import marketingRouter from "./marketing";
 import flyersRouter from "./flyers";
 import impactRouter from "./impact";
+import syncRouter from "./sync";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(webhooksRouter);
 router.use(marketingRouter);
 router.use(flyersRouter);
 router.use(impactRouter);
+router.use(syncRouter);
 
 export default router;

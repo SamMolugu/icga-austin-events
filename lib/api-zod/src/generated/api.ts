@@ -356,6 +356,13 @@ export const CreateDonationResponse = zod.object({
 /**
  * @summary Get organizer dashboard metrics
  */
+export const SyncCalendarResponse = zod.object({
+  "events": zod.number().int(),
+  "funds": zod.number().int(),
+  "live": zod.number().int(),
+  "syncedAt": zod.coerce.date()
+})
+
 export const GetAnalyticsOverviewResponse = zod.object({
   "totalEvents": zod.number().int(),
   "upcomingEvents": zod.number().int(),
@@ -363,7 +370,32 @@ export const GetAnalyticsOverviewResponse = zod.object({
   "registrationChange": zod.number(),
   "totalRaised": zod.number(),
   "goalProgress": zod.number(),
-  "averageAttendance": zod.number()
+  "averageAttendance": zod.number(),
+  "ticketsIssued": zod.number().int(),
+  "ticketsCheckedIn": zod.number().int(),
+  "waitlistedCount": zod.number().int(),
+  "lastCalendarSync": zod.coerce.date().nullish(),
+  "funds": zod.array(zod.object({
+    "id": zod.number().int(),
+    "name": zod.string(),
+    "kind": zod.enum(['program', 'development']),
+    "description": zod.string(),
+    "goal": zod.number(),
+    "raised": zod.number()
+  })),
+  "headcounts": zod.array(zod.object({
+    "id": zod.number().int(),
+    "title": zod.string(),
+    "category": zod.string(),
+    "startsAt": zod.coerce.date(),
+    "capacity": zod.number().int(),
+    "registeredCount": zod.number().int(),
+    "waitlisted": zod.number().int(),
+    "checkedIn": zod.number().int(),
+    "charityName": zod.string(),
+    "charityGoal": zod.number(),
+    "charityRaised": zod.number()
+  }))
 })
 
 

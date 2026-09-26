@@ -14,6 +14,7 @@ import {
   UpdateEventParams,
   UpdateEventResponse,
 } from "@workspace/api-zod";
+import { pickEventImage } from "../lib/images";
 import { requireAuth } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
@@ -69,7 +70,7 @@ router.post("/events", requireAuth, async (req, res): Promise<void> => {
   const [event] = await db.insert(eventsTable).values({
     ...parsed.data,
     slug: slugify(parsed.data.title),
-    imageUrl: parsed.data.imageUrl ?? null,
+    imageUrl: parsed.data.imageUrl || pickEventImage(parsed.data),
   }).returning();
   await db.insert(activityTable).values({ type: "event", message: `Created ${event.title}` });
   res.status(201).json(CreateEventResponse.parse(event));

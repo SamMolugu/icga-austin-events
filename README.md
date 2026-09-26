@@ -4,7 +4,8 @@ ICGA Austin Events is a community scheduling and registration platform for the I
 
 ## What it includes
 
-- Public ICGA event calendar with search, category filters, event photos, and a geometric page background
+- Public ICGA event calendar with search, category filters, modest event photos, and a geometric page background
+- Periodic sync from austinmosque.org/calendar and austinmosque.org/support-us
 - Event detail pages with registration, approved flyers, and capacity-aware waitlists
 - Registration confirmation pages with ticket codes
 - Public impact page for program giving, campus development, tickets, and recent gifts
@@ -104,6 +105,7 @@ The main API routes are:
 - `GET /api/registrations?eventId=:eventId` (organizer-only attendee list)
 - `GET /api/donations`
 - `POST /api/donations`
+- `POST /api/organizer/sync` (organizer-only refresh from austinmosque.org)
 - `GET /api/impact`
 - `GET /api/funds`
 - `POST /api/funds/:fundId/gifts` (organizer-only)
