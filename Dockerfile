@@ -1,4 +1,4 @@
-FROM node:24-alpine AS deps
+FROM node:24-bookworm-slim AS deps
 WORKDIR /app
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable
@@ -28,7 +28,7 @@ RUN pnpm --filter @workspace/api-spec run codegen \
 FROM build AS migrate
 CMD ["pnpm", "--filter", "@workspace/db", "run", "push-force"]
 
-FROM node:24-alpine AS runtime
+FROM node:24-bookworm-slim AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=5000
